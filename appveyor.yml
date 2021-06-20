@@ -1,0 +1,25 @@
+version: 'sus-{build}'
+branches:
+  only:
+  - main
+skip_tags: true
+image: Ubuntu2004
+clone_folder: /home/appveyor/site
+
+environment:
+  HAXELIB_ROOT: /home/appveyor/haxelib
+  HAXE_INSTALLDIR: /home/appveyor/haxe
+  SRC_REPO: https://github.com/aflacc/ProjectFNF.git
+  GITHUB_ACCESS_TOKEN:
+    secure: AYoRbFDfZVEdfVVzZFuz5wJXJkAEOOkHtgAweikYp3tqImQUhwg2P6dCjyPxEF7o
+
+install:
+  - git config --global credential.helper store
+  - printf "https://$GITHUB_ACCESS_TOKEN:x-oauth-basic@github.com\n" > $HOME/.git-credentials
+  - git config --global user.email "mycatisagoodboi@gmail.com"
+  - git config --global user.name "Derpy-Jacob-903"
+  - git clone $SRC_REPO /home/appveyor/src
+build_script:
+  - git fetch -t v0.2-e-2 https://github.com/aflacc/ProjectFNF.git
+  # sus
+  - git push

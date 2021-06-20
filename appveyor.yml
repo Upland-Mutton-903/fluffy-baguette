@@ -20,6 +20,6 @@ install:
   - git config --global user.name "Derpy-Jacob-903"
   - git clone $SRC_REPO /home/appveyor/src
 build_script:
-  - git fetch -t v0.2-e-2 https://github.com/aflacc/ProjectFNF.git
+  - git fetch -t v0.2-e-2
   # sus
   - git push

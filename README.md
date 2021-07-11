@@ -1,7 +1,7 @@
 
-[![Discord](https://img.shields.io/discord/826580018346852372?color=7289da&icon=discord&label=Discord&logoColor=%234e5d94&style=for-the-badge&icon=disc)](https://discord.gg/fmxuXhRqMU)  [![Version](https://img.shields.io/github/v/release/aflacc/ProjectFNF?label=Release&style=for-the-badge)](https://github.com/aflacc/ProjectFNF/releases)  [![Updated](https://img.shields.io/github/last-commit/aflacc/ProjectFNF?label=Updated&style=for-the-badge)](https://github.com/aflacc/ProjectFNF/commits/master) [![Activity](https://img.shields.io/github/commit-activity/w/aflacc/ProjectFNF?label=Activity&style=for-the-badge)](https://github.com/aflacc/ProjectFNF/commits/master)\
+![Discord](https://img.shields.io/discord/826580018346852372?color=7289da&icon=discord&label=Discord&logoColor=%234e5d94&style=for-the-badge&icon=disc)(https://discord.gg/fmxuXhRqMU)  [![Version](https://img.shields.io/github/v/release/aflacc/ProjectFNF?label=Release&style=for-the-badge)](https://github.com/aflacc/ProjectFNF/releases)  [![Updated](https://img.shields.io/github/last-commit/aflacc/ProjectFNF?label=Updated&style=for-the-badge)](https://github.com/aflacc/ProjectFNF/commits/master) [![Activity](https://img.shields.io/github/commit-activity/w/aflacc/ProjectFNF?label=Activity&style=for-the-badge)](https://github.com/aflacc/ProjectFNF/commits/master)\
 [![Documentation Status](https://readthedocs.org/projects/projectfnf-wiki/badge/?version=latest)](https://projectfnf-wiki.readthedocs.io/en/latest/?badge=latest)
-
+![Code Size](https://img.shields.io/github/languages/code-size/aflacc/ProjectFNF?style=plastic)
 ***
 <div align="center"> <img src="https://github.com/aflacc/ProjectFNF/blob/master/art/projectfnf.png?raw=true" height=500 width=500 align="center"></div>
 <div align="center">Quality of Life & Highly Compatibile Engine</div>
@@ -34,7 +34,27 @@ ProjectFNF is a engine for Friday Night Funkin' designed to be flexible. It cont
 - Ability to hide the second player's notes
 - Much more
 
-# Mods that use ProjectFNF
+# Compare
+| Topic | ProjectFNF | Kade Engine |  
+| :------------- | :----------: | -----------: |
+| Modcharting support for Windows | Yes  |  Yes | 
+| Modcharting support for Linux | Yes | No |
+| Modcharting support for Mac  | Yes | No |
+| Offset timing | Coming Soon! | Yes |
+| Customizeable Keybinds | Yes |  Yes |
+| Hit Sounds | Yes | No |
+| Custom Arrow Skins | Yes | No |
+| Increased FPS | Yes | Yes |
+| Early Windows and better ratings | Yes | Yes |
+| End screen | Yes | Yes |
+| Modifiers | Yes | No |
+| Downscroll | Yes | Yes |
+| Replays | No | Yes |
+| Audio Offset | Coming Soon! | Yes |
+| Accuracy and Grades | Yes | Yes |
+| Pause countdown | Yes | No |
+
+# Mods that use ProjecFNF
 - neo (woah)
 - VS Aflac
 - Wii Deleted You
@@ -46,10 +66,11 @@ ProjectFNF is a engine for Friday Night Funkin' designed to be flexible. It cont
 - Doodles Modchart (AKA High effort Doodles)
 
 # Special Thanks :)
-- KadeDev: Rating code and keybind code
-- 
+- KadeDev: Rating code, downscroll code and keybind code
+- Palladium346: Second icon grid
+
 # Usage
-We do not ask for much, all we ask is you link the github and if the mod is on gamebanana make sure to credit aflack for making the engine. Also please do not remove the ProjectFNF version on the bottom of the screen in the main menu, this gives the engine its credit and also makes it easier to receive help with the mod. I will *not* be able to help you if you do not have the version of ProjectFNF in the game. also make sure to add the tag "projectfnf" to the github page.
+We do not ask for much, all we ask is you link the github and if the mod is on gamebanana make sure to credit aflack and Magnus for making the engine. Also please do not remove the ProjectFNF version on the bottom of the screen in the main menu, this gives the engine its credit and also makes it easier to receive help with the mod. I will *not* be able to help you if you do not have the version of ProjectFNF in the game. also make sure to add the tag "projectfnf" to the github page.
 
 # General Statistics
 [![Issues](https://img.shields.io/github/issues/aflacc/ProjectFNF?style=for-the-badge)](https://github.com/aflacc/ProjectFNF/issues)

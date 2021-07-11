@@ -86,10 +86,22 @@ class OptionsMenu extends MusicBeatState
 				case "Hit Sounds":
 					if (!FlxG.save.data.hitsounds)
 						FlxG.save.data.hitsounds = controlsStrings[curSelected].split(" || ")[2];
+				case "New Icons":
+					if (!FlxG.save.data.newicons)
+						FlxG.save.data.newicons = controlsStrings[curSelected].split(" || ")[2];
+				case "Info Bar BG":
+					if (!FlxG.save.data.infobarbg)
+						FlxG.save.data.infobarbg = controlsStrings[curSelected].split(" || ")[2];
+				case "Custom Scroll Speed":
+					if (!FlxG.save.data.customscrollspeed)
+						FlxG.save.data.customscrollspeed = 0;
 				case "Change Note Theme":
-					if (!FlxG.save.data.notetheme)
+					if (FlxG.save.data.notetheme == null)
 						FlxG.save.data.notetheme = "NOTE";
-				case "Customize Info Bar":
+				case "Max Optimization":
+					if (!FlxG.save.data.maxoptimization) {
+						FlxG.save.data.maxoptimization = controlsStrings[curSelected].split(" || ")[2];
+					}
 			}
 			FlxG.save.flush();
 
@@ -156,6 +168,15 @@ class OptionsMenu extends MusicBeatState
 				case "Hit Sounds":
 					FlxG.save.data.hitsounds = !FlxG.save.data.hitsounds;
 					optionsText.text = FlxG.save.data.hitsounds;
+				case "New Icons":
+					FlxG.save.data.newicons = !FlxG.save.data.newicons;
+					optionsText.text = FlxG.save.data.newicons;
+				case "Info Bar BG":
+					FlxG.save.data.infobarbg = !FlxG.save.data.infobarbg;
+					optionsText.text = FlxG.save.data.infobarbg;
+				case "Max Optimization":
+					FlxG.save.data.maxoptimization = !FlxG.save.data.maxoptimization;
+					optionsText.text = FlxG.save.data.maxoptimization;
 				case "Change Note Theme":
 					noteselection++;
 					if (noteselection > notetypes.length - 1)
@@ -177,12 +198,31 @@ class OptionsMenu extends MusicBeatState
 				//	trace(FlxG.save.data.notetheme);
 				case "Customize Keybinds":
 					OptionsMenu.instance.openSubState(new KeyBindMenu());
+				case "Modifiers":
+					FlxG.switchState(new ModifiersMenu());
 				case "Customize Info Bar": // lol
 					OptionsMenu.instance.openSubState(new InfoBarSubstate());
+				case "Reset":
+					reset();
 			}
 			FlxG.save.flush();
 			// this could be us but FlxG savedata sucks dick and im too lazy to see how kade engine did it
 			//	FlxG.save.data[controlsStrings[curSelected].split(" || ")[1]] = !FlxG.save.data.options[controlsStrings[curSelected].split(" || ")[1]];
+		}
+		if (controls.LEFT_P) {
+			switch (controlsStrings[curSelected].substring(3).split(" || ")[0]) {
+				case "Custom Scroll Speed":
+					if (FlxG.save.data.customscrollspeed > 0)
+						FlxG.save.data.customscrollspeed -= 0.1;
+						optionsText.text = FlxG.save.data.customscrollspeed;
+			}
+		}
+		if (controls.RIGHT_P) {
+			switch (controlsStrings[curSelected].substring(3).split(" || ")[0]) {
+				case "Custom Scroll Speed":
+					FlxG.save.data.customscrollspeed += 0.1;
+					optionsText.text = FlxG.save.data.customscrollspeed;
+			}
 		}
 		if (controls.BACK)
 			FlxG.switchState(new MainMenuState());
@@ -244,6 +284,12 @@ class OptionsMenu extends MusicBeatState
 				optionsText.text = FlxG.save.data.botplay;
 			case "Hit Sounds":
 				optionsText.text = FlxG.save.data.hitsounds;
+			case "Max Optimization":
+				optionsText.text = FlxG.save.data.maxoptimization;
+			case "New Icons":
+				optionsText.text = FlxG.save.data.newicons;
+			case "Info Bar BG":
+				optionsText.text = FlxG.save.data.infobarbg;
 			case "Change Note Theme":
 				if (FlxG.save.data.notetheme == "NOTE")
 				{
@@ -260,6 +306,8 @@ class OptionsMenu extends MusicBeatState
 				viewer.animation.play('static');
 			case "Customize Keybinds":
 				optionsText.text = "Press ENTER";
+			case "Custom Scroll Speed":
+				optionsText.text = FlxG.save.data.customscrollspeed;
 			default: // i am so lazy :LOOOOL I cant figure this out
 				optionsText.text = "Press ENTER";
 				optionsDesc.text = "Customize your info bar by adding modules.(WIP, DOES NOT WORK IF ADVANCED INFO TEXT IS OFF)";
@@ -283,5 +331,9 @@ class OptionsMenu extends MusicBeatState
 				// item.setGraphicSize(Std.int(item.width));
 			}
 		}
+	}
+
+	function reset() {
+		
 	}
 }

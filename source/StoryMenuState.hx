@@ -32,15 +32,6 @@ class StoryMenuState extends MusicBeatState
 		['Cocoa', 'Eggnog', 'Winter-Horrorland'],
 		['Senpai', 'Roses', 'Thorns']
 	];
-	var weekColors:Array<FlxColor> = [
-		0xFFca1f6f, // GF
-		0xFFc885e5, // DAD
-		0xFFf9a326, // SPOOKY
-		0xFFceec75, // PICO
-		0xFFec7aac, // MOM
-		0xFFffffff, // PARENTS-CHRISTMAS (Look I don't know what a Better color would be.)
-		0xFFffaa6f // SENPAI
-	];
 	var curDifficulty:Int = 1; // 0 = easy, 1 = normal, 2 = hard
 
 	public static var weekUnlocked:Array<Bool> = [true, true, true, true, true, true, true]; // If the weeks are unlocked
@@ -231,6 +222,8 @@ class StoryMenuState extends MusicBeatState
 
 		trace("Line 165");
 
+		changeWeek();
+
 		super.create();
 	}
 
@@ -379,6 +372,13 @@ class StoryMenuState extends MusicBeatState
 		FlxTween.tween(sprDifficulty, {y: leftArrow.y + 15, alpha: 1}, 0.07);
 	}
 
+	override function beatHit() {
+		trace("beat");
+		grpWeekCharacters.members[0].animation.play(weekCharacters[curWeek][0]);
+		grpWeekCharacters.members[1].animation.play(weekCharacters[curWeek][1]);
+		grpWeekCharacters.members[2].animation.play(weekCharacters[curWeek][2]);
+		super.beatHit();
+	}
 	var lerpScore:Int = 0;
 	var intendedScore:Int = 0;
 
@@ -402,8 +402,8 @@ class StoryMenuState extends MusicBeatState
 				item.alpha = 0.6;
 			bullShit++;
 		}
-		FlxTween.color(txtTracklist, 0.1, txtTracklist.color, weekColors[curWeek]);
-		FlxTween.color(yellowBG, 0.1, yellowBG.color, weekColors[curWeek]); // not yellow anymore :sunglasses:
+		FlxTween.color(txtTracklist, 0.1, txtTracklist.color, Config.weekColors[curWeek]);
+		FlxTween.color(yellowBG, 0.1, yellowBG.color, Config.weekColors[curWeek]); // not yellow anymore :sunglasses:
 
 		FlxG.sound.play(Paths.sound('scrollMenu'));
 

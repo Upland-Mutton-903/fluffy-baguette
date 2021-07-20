@@ -6,15 +6,13 @@ import Discord.DiscordClient;
 import flixel.FlxG;
 import flixel.FlxSprite;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.graphics.frames.FlxAtlasFrames;
-import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.group.FlxGroup;
 import flixel.math.FlxMath;
 import flixel.text.FlxText;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import lime.net.curl.CURLCode;
+import lime.app.Application;
 
 using StringTools;
 
@@ -118,7 +116,7 @@ class StoryMenuState extends MusicBeatState
 
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("Selecting a Week", null);
+		DiscordClient.changePresence("Selecting a Week", "Version " + Application.current.meta.get('version'));
 		#end
 
 		for (i in 0...weekData.length)

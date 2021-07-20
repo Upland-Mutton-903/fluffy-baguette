@@ -8,13 +8,11 @@ import flixel.FlxObject;
 import flixel.FlxSprite;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.effects.FlxFlicker;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
-import io.newgrounds.NG;
 import lime.app.Application;
 
 using StringTools;
@@ -38,7 +36,7 @@ class MainMenuState extends MusicBeatState
 	{
 		#if desktop
 		// Updating Discord Rich Presence
-		DiscordClient.changePresence("Browsing the Main Menu", null);
+		DiscordClient.changePresence("Browsing the Main Menu", "Version " + Application.current.meta.get('version'));
 		#end
 
 		transIn = FlxTransitionableState.defaultTransIn;

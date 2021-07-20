@@ -1,31 +1,20 @@
 package;
 
-import lime.app.Application;
-import flixel.addons.display.FlxBackdrop;
-import flixel.util.FlxAxes;
 import haxe.Timer;
+import lime.app.Application;
 #if desktop
 import Discord.DiscordClient;
 #end
 import Section.SwagSection;
 import Song.SwagSong;
-import WiggleEffect.WiggleEffectType;
-import flixel.FlxBasic;
 import flixel.FlxCamera;
 import flixel.FlxG;
-import flixel.FlxGame;
 import flixel.FlxObject;
 import flixel.FlxSprite;
-import flixel.FlxState;
 import flixel.FlxSubState;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.effects.FlxTrail;
-import flixel.addons.effects.FlxTrailArea;
-import flixel.addons.effects.chainable.FlxEffectSprite;
 import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.addons.transition.FlxTransitionableState;
-import flixel.graphics.atlas.FlxAtlas;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup.FlxTypedGroup;
 import flixel.math.FlxMath;
 import flixel.math.FlxPoint;
@@ -35,16 +24,11 @@ import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.ui.FlxBar;
-import flixel.util.FlxCollision;
 import flixel.util.FlxColor;
 import flixel.util.FlxSort;
-import flixel.util.FlxStringUtil;
 import flixel.util.FlxTimer;
-import haxe.Json;
 import lime.utils.Assets;
-import openfl.display.BlendMode;
-import openfl.display.StageQuality;
-import openfl.filters.ShaderFilter;
+import lime.app.Application;
 
 using StringTools;
 
@@ -332,7 +316,7 @@ class PlayState extends MusicBeatState
 		detailsPausedText = "Paused on " + detailsText;
 
 		// Updating Discord Rich Presence.
-		DiscordClient.changePresence(detailsText, "Score: " + songScore, iconRPC);
+		DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'), iconRPC);
 		#end
 
 	if (!FlxG.save.data.maxoptimization) {
@@ -1182,6 +1166,7 @@ class PlayState extends MusicBeatState
 						};
 					}
 				case 4:
+					trace("OFFSET: " + FlxG.save.data.offset / 10);
 				/*	for (note in 0...strumLineNotes.members.length) {
 						ModCharts.circleLoop(strumLineNotes.members[note], 100, 3);
 				  }*/
@@ -1214,9 +1199,20 @@ class PlayState extends MusicBeatState
 		#if desktop
 		// Song duration in a float, useful for the time left feature
 		songLength = FlxG.sound.music.length;
+		if (isStoryMode)
+			{
+				detailsText = "Story Mode: " + SONG.song;
+			}
+			else
+			{
+				detailsText = "Free Play: " + SONG.song;
+			}
+	
+			// String for when the game is paused
+			detailsPausedText = "Paused on " + detailsText;
 
 		// Updating Discord Rich Presence (with Time Left)
-		DiscordClient.changePresence(detailsText, "Score: " + songScore, iconRPC, true, songLength);
+		DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'), iconRPC, true, songLength);
 		updateLoop();
 		#end
 	}
@@ -1226,7 +1222,19 @@ class PlayState extends MusicBeatState
 		#if desktop
 		var timer = Timer.delay(function()
 		{
-			DiscordClient.changePresence(detailsText, "Score: " + songScore + " / Accuracy: " + (songNotesHit / (songNotesHit + songNotesMissed) * 100) + "%",
+			if (isStoryMode)
+				{
+					detailsText = "Story Mode: " + SONG.song;
+				}
+				else
+				{
+					detailsText = "Free Play: " + SONG.song;
+				}
+		
+				// String for when the game is paused
+				detailsPausedText = "Paused on " + detailsText;
+
+			DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'), 
 				iconRPC);
 			updateLoop();
 		}, 5000);
@@ -1268,7 +1276,9 @@ class PlayState extends MusicBeatState
 
 			for (songNotes in section.sectionNotes)
 			{
-				var daStrumTime:Float = songNotes[0];
+				//trace("STRUM TIME WITHOUT: " + songNotes[0])
+				//trace("STRUM TIME WITH: " + FlxG.save.data.offset)
+				var daStrumTime:Float = songNotes[0] + (FlxG.save.data.offset / 10);
 				var daNoteData:Int = Std.int(songNotes[1] % 4);
 
 				var gottaHitNote:Bool = section.mustHitSection;
@@ -1441,6 +1451,13 @@ class PlayState extends MusicBeatState
 			babyArrow.x += 50;
 			babyArrow.x += ((FlxG.width / 2) * player);
 
+			if (FlxG.save.data.middlescroll) {
+				babyArrow.x -= 275;
+				if (player != 1) {
+					babyArrow.visible = false;
+				}
+			}
+
 			strumLineNotes.add(babyArrow);
 			ModCharts.quickSpin(babyArrow);
 		}
@@ -1498,21 +1515,25 @@ class PlayState extends MusicBeatState
 				paused = false;
 
 			#if desktop
+			if (isStoryMode)
+				{
+					detailsText = "Story Mode: " + SONG.song;
+				}
+				else
+				{
+					detailsText = "Free Play: " + SONG.song;
+				}
+		
+				// String for when the game is paused
+				detailsPausedText = "Paused on " + detailsText;
+
 			if (startTimer.finished)
 			{
-				DiscordClient.changePresence(detailsText,
-					"Score: "
-					+ songScore
-					+ " / Accuracy: "
-					+ (songNotesHit / (songNotesHit + songNotesMissed) * 100)
-					+ "%", iconRPC, true,
-					songLength
-					- Conductor.songPosition);
+				DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'));
 			}
 			else
 			{
-				DiscordClient.changePresence(detailsText,
-					"Score: " + songScore + " / Accuracy: " + (songNotesHit / (songNotesHit + songNotesMissed) * 100) + "%", iconRPC);
+				DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'), iconRPC);
 			}
 			#end
 		}
@@ -1525,21 +1546,26 @@ class PlayState extends MusicBeatState
 		#if desktop
 		if (health > 0 && !paused)
 		{
+			if (isStoryMode)
+				{
+					detailsText = "Story Mode: " + SONG.song;
+				}
+				else
+				{
+					detailsText = "Free Play: " + SONG.song;
+				}
+		
+				// String for when the game is paused
+				detailsPausedText = "Paused on " + detailsText;
+
+				
 			if (Conductor.songPosition > 0.0)
 			{
-				DiscordClient.changePresence(detailsText,
-					"Score: "
-					+ songScore
-					+ " / Accuracy: "
-					+ (songNotesHit / (songNotesHit + songNotesMissed) * 100)
-					+ "%", iconRPC, true,
-					songLength
-					- Conductor.songPosition);
+				DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'));
 			}
 			else
 			{
-				DiscordClient.changePresence(detailsText,
-					"Score: " + songScore + " / Accuracy: " + (songNotesHit / (songNotesHit + songNotesMissed) * 100) + "%", iconRPC);
+				DiscordClient.changePresence(detailsText, "Version " + Application.current.meta.get('version'), iconRPC);
 			}
 		}
 		#end
@@ -1552,12 +1578,19 @@ class PlayState extends MusicBeatState
 		#if desktop
 		if (health > 0 && !paused)
 		{
-			DiscordClient.changePresence(detailsPausedText,
-				"Score: "
-				+ songScore
-				+ " / Accuracy: "
-				+ (songNotesHit / (songNotesHit + songNotesMissed) * 100)
-				+ "%", iconRPC);
+			if (isStoryMode)
+				{
+					detailsText = "Story Mode: " + SONG.song;
+				}
+				else
+				{
+					detailsText = "Free Play: " + SONG.song;
+				}
+		
+				// String for when the game is paused
+				detailsPausedText = "Paused on " + detailsText;
+
+			DiscordClient.changePresence(detailsPausedText, "Version " + Application.current.meta.get('version'), iconRPC);
 		}
 		#end
 
@@ -1743,8 +1776,10 @@ class PlayState extends MusicBeatState
 			else
 				openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
 
+				var detailsPausedText = "Paused on " + SONG.song;
+
 			#if desktop
-			DiscordClient.changePresence(detailsPausedText, "Score: " + songScore, iconRPC);
+			DiscordClient.changePresence(detailsPausedText, "Version " + Application.current.meta.get('version'), iconRPC);
 			#end
 		}
 
@@ -1753,7 +1788,7 @@ class PlayState extends MusicBeatState
 			FlxG.switchState(new ChartingState());
 
 			#if desktop
-			DiscordClient.changePresence("Chart Editor", null, null, true);
+			DiscordClient.changePresence("Chart Editor", "Version " + Application.current.meta.get('version'), null, true);
 			#end
 		}
 
@@ -1960,7 +1995,7 @@ class PlayState extends MusicBeatState
 
 			#if desktop
 			// Game Over doesn't get his own variable because it's only used here
-			DiscordClient.changePresence("Game Over - " + detailsText, "Score: " + songScore, iconRPC);
+			DiscordClient.changePresence("Game Over - " + detailsText, "Version " + Application.current.meta.get('version'), iconRPC);
 			#end
 		}
 
@@ -2041,9 +2076,9 @@ class PlayState extends MusicBeatState
 				if (FlxG.save.data.downscroll)
 					{
 						if (daNote.mustPress)
-							daNote.y = (playerStrums.members[Math.floor(Math.abs(daNote.noteData))].y + 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal( !usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed, 2));
+							daNote.y = (playerStrums.members[Math.floor(Math.abs(daNote.noteData))].y + 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal( !usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed / 10, 2));
 						else
-							daNote.y = (strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].y + 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal( !usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed, 2));
+							daNote.y = (strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].y + 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal( !usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed / 10, 2));
 						if(daNote.isSustainNote)
 						{
 							// Remember = minus makes notes go up, plus makes them go down
@@ -2064,9 +2099,9 @@ class PlayState extends MusicBeatState
 					}else
 					{
 						if (daNote.mustPress)
-							daNote.y = (playerStrums.members[Math.floor(Math.abs(daNote.noteData))].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(!usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed, 2));
+							daNote.y = (playerStrums.members[Math.floor(Math.abs(daNote.noteData))].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal(!usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed / 10, 2));
 						else
-							daNote.y = (strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal( !usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed, 2));
+							daNote.y = (strumLineNotes.members[Math.floor(Math.abs(daNote.noteData))].y - 0.45 * (Conductor.songPosition - daNote.strumTime) * FlxMath.roundDecimal( !usingCustomScrollSpeed ? SONG.speed : FlxG.save.data.customscrollspeed / 10, 2));
 						if(daNote.isSustainNote)
 						{
 							daNote.y -= daNote.height / 2;
@@ -2198,7 +2233,9 @@ class PlayState extends MusicBeatState
 								if (daNote.nType != 1) {
 									health -= 0.075;
 								
-									songNotesMissed++;
+									if (!daNote.isSustainNote) {
+										songNotesMissed++;
+									}
 									trace(daNote.nType);
 									vocals.volume = 0;
 									if (theFunne)
@@ -2518,9 +2555,16 @@ class PlayState extends MusicBeatState
 
 		var seperatedScore:Array<Int> = [];
 
-		seperatedScore.push(Math.floor(combo / 100));
-		seperatedScore.push(Math.floor((combo - (seperatedScore[0] * 100)) / 10));
-		seperatedScore.push(combo % 10);
+		var comboSplit:Array<String> = (combo + "").split('');
+		
+		if (comboSplit.length == 2)
+			seperatedScore.push(0); // make sure theres a 0 in front or it looks weird lol!
+
+		for(i in 0...comboSplit.length)
+		{
+			var str:String = comboSplit[i];
+			seperatedScore.push(Std.parseInt(str));
+		}
 
 		var daLoop:Int = 0;
 		for (i in seperatedScore)
@@ -2811,16 +2855,20 @@ class PlayState extends MusicBeatState
 			} catch (e) {
 				trace("idk smtn");
 			}
+			trace(FlxG.save.data.ghosttapping);
+			trace(boyfriend.stunned);
 			if (!FlxG.save.data.ghosttapping) {
 			if (!boyfriend.stunned)
 			{
+				trace('balls');
 				health -= 0.04;
 				if (combo > 5 && gf.animOffsets.exists('sad'))
 				{
 					gf.playAnim('sad');
 				}
 				combo = 0;
-				songNotesMissed++;
+				if (!note.isSustainNote)
+					songNotesMissed++;
 				trace("Misse added at notemiss");
 	
 				//var noteDiff:Float = Math.abs(daNote.strumTime - Conductor.songPosition);
@@ -2957,6 +3005,7 @@ class PlayState extends MusicBeatState
 
 		// SEXY FAILSAFE (THANKS VM U A REAL ONE)
 		if (note == 'none') {
+			if (FlxG.save.data.ghosttapping) {
 			if (FlxG.save.data.enablemissanimations) { // indenting worked out in the end *holds hands with family*
 				if (leftP) {
 					boyfriend.playAnim('singLEFTmiss', true);
@@ -2979,6 +3028,49 @@ class PlayState extends MusicBeatState
 						FlxG.camera.shake(Config.MISSINTENSITY, 0.1, null, true, X); 
 				}
 			}
+			} else { // ehh fuck it
+				health -= 0.04;
+				if (combo > 5 && gf.animOffsets.exists('sad'))
+				{
+					gf.playAnim('sad');
+				}
+				combo = 0;
+				songNotesMissed++;
+	
+				songScore -= 10;
+	
+				FlxG.sound.play(Paths.soundRandom('missnote', 1, 3), FlxG.random.float(0.1, 0.2));
+	
+				boyfriend.stunned = true;
+							// get stunned for 5 seconds
+				new FlxTimer().start(5, function(tmr:FlxTimer)
+				{
+					boyfriend.stunned = false;
+				});
+				if (FlxG.save.data.enablemissanimations) { // indenting worked out in the end *holds hands with family*
+					if (leftP) {
+						boyfriend.playAnim('singLEFTmiss', true);
+						if (FlxG.save.data.missshake)
+							FlxG.camera.shake(Config.MISSINTENSITY, 0.1, null, true, X);
+					}
+					if (downP) {
+						boyfriend.playAnim('singDOWNmiss', true);
+						if (FlxG.save.data.missshake)
+							FlxG.camera.shake(Config.MISSINTENSITY, 0.1, null, true, X);
+					}
+					if (upP) {
+						boyfriend.playAnim('singUPmiss', true);
+						if (FlxG.save.data.missshake)
+							FlxG.camera.shake(Config.MISSINTENSITY, 0.1, null, true, X);
+					}
+					if (rightP) {
+						boyfriend.playAnim('singRIGHTmiss', true);
+						if (FlxG.save.data.missshake)
+							FlxG.camera.shake(Config.MISSINTENSITY, 0.1, null, true, X); 
+					}
+			updateInfo();
+			}
+		}
 			return;
 		}
 
@@ -3000,7 +3092,8 @@ class PlayState extends MusicBeatState
 			{
 				badNoteCheck(note);
 			}
-			if (note.nType != 1) {
+			if (note.nType != 1 && !note.isSustainNote) {
+				trace("note shit OWO");
 				songNotesHit += 1;
 			}
 			if (FlxG.save.data.hitsounds) {

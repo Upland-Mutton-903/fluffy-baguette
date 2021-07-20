@@ -2,25 +2,18 @@ package; #if desktop import Discord.DiscordClient;
 
 import sys.thread.Thread; #end import flixel.FlxG;
 import flixel.FlxSprite;
-import flixel.FlxState;
-import flixel.addons.display.FlxGridOverlay;
 import flixel.addons.transition.FlxTransitionSprite.GraphicTransTileDiamond;
 import flixel.addons.transition.FlxTransitionableState;
 import flixel.addons.transition.TransitionData;
 import flixel.graphics.FlxGraphic;
-import flixel.graphics.frames.FlxAtlasFrames;
 import flixel.group.FlxGroup;
 import flixel.input.gamepad.FlxGamepad;
 import flixel.math.FlxPoint;
 import flixel.math.FlxRect;
-import flixel.system.FlxSound;
-import flixel.system.ui.FlxSoundTray;
-import flixel.text.FlxText;
 import flixel.tweens.FlxEase;
 import flixel.tweens.FlxTween;
 import flixel.util.FlxColor;
 import flixel.util.FlxTimer;
-import io.newgrounds.NG;
 import lime.app.Application;
 import openfl.Assets;
 
@@ -30,8 +23,9 @@ class TitleState extends MusicBeatState
 {
 	static var initialized:Bool = false;
 
+	static public var soundExt:String = ".ogg";
+	
 	var blackScreen:FlxSprite;
-	var PFNFLOGO:Bool = Config.CONFIGTitle; // Shows logo instead of Bumpin
 	var credGroup:FlxGroup;
 	var credTextShit:Alphabet;
 	var textGroup:FlxGroup;
@@ -144,18 +138,19 @@ class TitleState extends MusicBeatState
 		add(bg);
 
 		logoBl = new FlxSprite(-150, -100);
-		if (PFNFLOGO = true)
+		if (Config.CONFIGTitle == true) // AFLAC YOU ABSOLUTE MONKEY
 		{
 			logoBl.frames = Paths.getSparrowAtlas('ProjectFNFLogoBumpin');
 			logoBl.x += 180;
 			logoBl.y += 80;
 		}
-		else
+		else {
 			logoBl.frames = Paths.getSparrowAtlas('logoBumpin');
-		logoBl.antialiasing = true;
-		logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
-		logoBl.animation.play('bump');
-		logoBl.updateHitbox();
+			logoBl.antialiasing = true;
+			logoBl.animation.addByPrefix('bump', 'logo bumpin', 24);
+			logoBl.animation.play('bump');
+			logoBl.updateHitbox();
+		}
 		// logoBl.screenCenter();
 		// logoBl.color = FlxColor.BLACK;
 
@@ -312,6 +307,7 @@ class TitleState extends MusicBeatState
 				}
 				else
 				{
+					//FlxG.switchState(new TapBPMState());
 					FlxG.switchState(new MainMenuState());
 				}
 			});

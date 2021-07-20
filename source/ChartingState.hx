@@ -1,5 +1,6 @@
 package;
 
+import flixel.FlxCamera;
 import lime.math.BGRA;
 import flixel.addons.effects.chainable.FlxWaveEffect;
 import flixel.addons.ui.FlxUIText;
@@ -37,6 +38,7 @@ import openfl.events.IOErrorEvent;
 import openfl.media.Sound;
 import openfl.net.FileReference;
 import openfl.utils.ByteArray;
+import lime.app.Application;
 
 using StringTools;
 
@@ -106,12 +108,15 @@ class ChartingState extends MusicBeatState
 	var grpLimoDancers:FlxTypedGroup<BackgroundDancer>;
 	var snapText:FlxText;
 	var evilNotes:Bool = false;
+	var camHUD:FlxCamera;
+	var camGame:FlxCamera;
 
+	var stepperBPM:FlxUINumericStepper;
 	function stage() {
 		trace("stage reset sussy");
-		switch (_song.song.toLowerCase())
+		switch (FlxG.random.int(0, 8))
 		{
-			case 'spookeez' | 'monster' | 'south':
+			case 1:
 				{
 					curStage = 'spooky';
 
@@ -126,7 +131,7 @@ class ChartingState extends MusicBeatState
 					halloweenBG.antialiasing = true;
 					add(halloweenBG);
 				}
-			case 'pico' | 'blammed' | 'philly':
+			case 2:
 				{
 					curStage = 'philly';
 
@@ -166,7 +171,7 @@ class ChartingState extends MusicBeatState
 					add(street);
 					street.scrollFactor.set(0, 0);
 				}
-			case 'milf' | 'satin-panties' | 'high':
+			case 3:
 				{
 					curStage = 'limo';
 					defaultCamZoom = 0.90;
@@ -215,7 +220,7 @@ class ChartingState extends MusicBeatState
 					var fastCar = new FlxSprite(-300, 160).loadGraphic(Paths.image('limo/fastCarLol'));
 					// add(limo);
 				}
-			case 'cocoa' | 'eggnog':
+			case 4:
 				{
 					curStage = 'mall';
 
@@ -273,7 +278,7 @@ class ChartingState extends MusicBeatState
 					add(santa);
 					santa.scrollFactor.set(0, 0);
 				}
-			case 'winter-horrorland':
+			case 5:
 				{
 					curStage = 'mallEvil';
 					var bg:FlxSprite = new FlxSprite(-400, -500).loadGraphic(Paths.image('christmas/evilBG'));
@@ -295,7 +300,7 @@ class ChartingState extends MusicBeatState
 					add(evilSnow);
 					evilSnow.scrollFactor.set(0, 0);
 				}
-			case 'senpai' | 'roses':
+			case 6:
 				{
 					curStage = 'school';
 
@@ -363,7 +368,7 @@ class ChartingState extends MusicBeatState
 					add(bgGirls);
 					bgGirls.scrollFactor.set(0, 0);
 				}
-			case 'thorns':
+			case 7:
 				{
 					curStage = 'schoolEvil';
 
@@ -412,8 +417,19 @@ class ChartingState extends MusicBeatState
 		}
 	}
 
+	function sex(bpm:Int) {
+		stepperBPM.value = Std.int(bpm);
+		tempBpm = Std.int(bpm);
+		Conductor.mapBPMChanges(_song);
+		Conductor.changeBPM(Std.int(bpm));
+	}
+
 	override function create()
 	{
+		
+		camHUD = new FlxCamera();
+		FlxG.cameras.add(camHUD);
+
 		curSection = lastSection;
 
 		if (PlayState.SONG != null)
@@ -432,7 +448,8 @@ class ChartingState extends MusicBeatState
 			};
 		}
 
-		stage();
+		if (FlxG.save.data.chartingbackground)
+			stage();
 		gridBG = FlxGridOverlay.create(GRID_SIZE, GRID_SIZE, GRID_SIZE * 8, GRID_SIZE * 16);
 		add(gridBG);
 
@@ -447,8 +464,8 @@ class ChartingState extends MusicBeatState
 		add(leftIcon);
 		add(rightIcon);
 
-		leftIcon.setPosition(0, -100);
-		rightIcon.setPosition(gridBG.width / 2, -100);
+		leftIcon.setPosition(0, 600);
+		rightIcon.setPosition(gridBG.width / 2, 600);
 
 		gridBlackLine = new FlxSprite(gridBG.x + gridBG.width / 2).makeGraphic(2, Std.int(gridBG.height), FlxColor.BLACK);
 		add(gridBlackLine);
@@ -485,19 +502,21 @@ class ChartingState extends MusicBeatState
 		var tabs = [
 			{name: "Song", label: 'Song'},
 			{name: "Section", label: 'Section'},
-			{name: "Note", label: 'Note'}
+			{name: "Note", label: 'Note'},
+			{name: "Extra", label: 'Extra'}
 		];
 
 		UI_box = new FlxUITabMenu(null, tabs, true);
 
 		UI_box.resize(300, 400);
-		UI_box.x = FlxG.width / 2;
+		UI_box.x = 320;
 		UI_box.y = 20;
 		add(UI_box);
 
 		addSongUI();
 		addSectionUI();
 		addNoteUI();
+		addExtraUI();
 
 		add(curRenderedNotes);
 		add(curRenderedSustains);
@@ -533,7 +552,7 @@ class ChartingState extends MusicBeatState
 				player2.x = 1050;
 		}
 		add(player1);
-		snapText = new FlxText(60,10,0,"Snap: 1/" + snap + " (Press Control to unsnap the cursor)\nAdd Notes: 1-8 (or click)\n", 14);
+		snapText = new FlxText(330,430,0,"Snap: 1/" + snap + " (Press Control to unsnap the cursor)\nAdd Notes: 1-8 (or click)\n", 14);
 		snapText.scrollFactor.set();
 		add(snapText);
 		add(player2);
@@ -600,7 +619,7 @@ class ChartingState extends MusicBeatState
 		stepperSpeed.value = _song.speed;
 		stepperSpeed.name = 'song_speed';
 
-		var stepperBPM:FlxUINumericStepper = new FlxUINumericStepper(10, 65, 0.1, 1, 1.0, 5000.0, 1);
+		stepperBPM = new FlxUINumericStepper(10, 65, 0.1, 1, 1.0, 5000.0, 1);
 		stepperBPM.value = Conductor.bpm;
 		stepperBPM.name = 'song_bpm';
 
@@ -651,7 +670,7 @@ class ChartingState extends MusicBeatState
 		UI_box.addGroup(tab_group_song);
 		UI_box.scrollFactor.set();
 
-		FlxG.camera.follow(strumLine);
+		//FlxG.camera.follow(strumLine);
 	}
 
 	var stepperLength:FlxUINumericStepper;
@@ -752,6 +771,48 @@ class ChartingState extends MusicBeatState
 			UI_box.add(player1);
 			UI_box.add(player2); */
 	}
+
+	var tab_group_extra:FlxUI;
+	var tapbpm:FlxButton;
+
+	function addExtraUI():Void
+	{
+		tab_group_extra = new FlxUI(null, UI_box);
+		tab_group_extra.name = 'Extra';
+
+
+		tapbpm = new FlxButton(100, 10, 'Tap BPM', function()
+			{
+				var state = new TapBPMSubState(_song.song, camHUD);
+				state.openCallback = function() {
+					FlxG.sound.music.pause();
+					vocals.pause();
+				}
+				state.closeCallback = function() {
+					FlxG.sound.music.play();
+					vocals.play();
+					if (state.saving)
+						sex(Math.round(state.tpm));
+				}
+				openSubState(state);
+			});
+
+		tab_group_extra.add(tapbpm);
+
+		UI_box.addGroup(tab_group_extra);
+
+		/*player2 = new Character(0,gridBG.y, _song.player2);
+			player1 = new Boyfriend(player2.width * 0.2,gridBG.y + player2.height, _song.player1);
+
+			player1.y = player1.y - player1.height;
+
+			player2.setGraphicSize(Std.int(player2.width * 0.2));
+			player1.setGraphicSize(Std.int(player1.width * 0.2));
+
+			UI_box.add(player1);
+			UI_box.add(player2); */
+	}
+
 
 	function loadSong(daSong:String):Void
 	{
